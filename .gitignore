@@ -1,0 +1,43 @@
+# Node.js
+node_modules/
+
+# TypeScript
+dist/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment Variables
+.env
+
+# OS Specific Files
+.DS_Store
+Thumbs.db
+
+# IDE Specific Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# npm package lock files (if using npm)
+package-lock.json
+yarn.lock
+
+# Coverage directory used by testing tools like jest
+coverage/
+
+# Temporary build files
+tmp/
+temp/
+
+# Debugging
+.vscode/launch.json
+
+# Optional: Gitignore itself (prevents it from being modified accidentally)
+# .gitignore
