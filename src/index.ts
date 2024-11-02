@@ -1,17 +1,45 @@
-import express, { Request, Response } from 'express';
-import dotenv from 'dotenv';
-dotenv.config();
-import helmet from 'helmet';
+import express from "express";
+import { dbConnect } from "./db/dbConnect";
+import bodyParser from "body-parser";
+import cors from "cors";
+import { swaggerDocs } from "./swagger";
+import swaggerUi from "swagger-ui-express";
+import { testRouter } from "./routes/testRoutes";
+import "../src/cron/otpCleanupCron";
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
-app.use(helmet());
+// Execute database connection
+dbConnect();
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, World abcdee!');
+app.use(bodyParser.json());
+app.use(
+  bodyParser.urlencoded({
+    extended: true,
+  })
+);
+app.use(cors());
+app.use(express.json());
+
+/************** Swagger Doc Routes **************/
+
+app.use("/api/v1/docs", swaggerUi?.serve, swaggerUi?.setup(swaggerDocs));
+
+/************** Test, User Auth Routes **************/
+
+app.get("/", (req: any, res: any) => {
+  res.send("Hello, World abcdee!");
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.get("/test", (req: any, res: any) => {
+  res
+    .status(200)
+    .send({ data: "Hello, this is test api welcome to port 8080" });
+});
+
+app.use("/api/v1", testRouter);
+
+app.listen(PORT, () => {
+  console.log(`Server started on port ${PORT}`);
 });
