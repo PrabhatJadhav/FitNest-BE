@@ -4,7 +4,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { swaggerDocs } from './swagger';
 import swaggerUi from 'swagger-ui-express';
-import { v1Router } from './routes/v1-routes';
+import { v1Router } from './versions/v1-routes';
 import '../src/cron/otpCleanupCron';
 
 const app = express();
