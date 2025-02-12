@@ -21,6 +21,7 @@
 
 // ********************************************* New Connection *********************************************
 
+require('dotenv').config();
 import * as fs from 'fs';
 import * as pg from 'pg';
 
