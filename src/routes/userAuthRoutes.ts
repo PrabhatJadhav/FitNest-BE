@@ -1,10 +1,6 @@
-import {
-  customerRegister,
-  customerLogin,
-  verifyOtp,
-  getRefreshToken,
-} from '../controller/authController';
-import { authenticateToken } from '../middleware/verifyTokens';
+import { login } from '../controller/authController';
+import { authenticateToken } from '../utils/authUtils';
+
 const express = require('express');
 const userAuthRouter = express.Router();
 
@@ -19,10 +15,6 @@ const userAuthRouter = express.Router();
  *       200:
  *         data: Hello, this is test api welcome to port 8080
  */
-
-userAuthRouter.get('/test-api', (req: any, res: any) => {
-  res.status(200).send({ data: 'Hello, this is test api in testRouter' });
-});
 
 userAuthRouter.get(
   '/test-auth-access-api',
@@ -74,12 +66,12 @@ userAuthRouter.get(
  *        description: Server Error
  */
 
-userAuthRouter.post('/register', customerRegister);
+// userAuthRouter.post('/register', register);
 
-userAuthRouter.post('/login', customerLogin);
+userAuthRouter.post('/login', login);
 
-userAuthRouter.post('/verify-email-otp', verifyOtp);
+// userAuthRouter.post('/verify-email-otp', verifyOtp);
 
-userAuthRouter.post('/generate-refresh-token', getRefreshToken);
+// userAuthRouter.post('/generate-refresh-token', getRefreshToken);
 
 export { userAuthRouter };
