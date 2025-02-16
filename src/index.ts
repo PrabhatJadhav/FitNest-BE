@@ -5,8 +5,7 @@ import cors from 'cors';
 import { swaggerDocs } from './swagger';
 import swaggerUi from 'swagger-ui-express';
 import { v1Router } from './versions/v1-routes';
-import '../src/cron/otpCleanupCron';
-import { createUserTable } from './model/user';
+// import '../src/cron/otpCleanupCron';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -43,6 +42,4 @@ app.use('/api/v1', v1Router);
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
-
-  createUserTable();
 });
