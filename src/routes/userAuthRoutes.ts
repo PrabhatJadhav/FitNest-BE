@@ -1,4 +1,4 @@
-import { login } from '../controller/authController';
+import { getRefreshToken, login } from '../controller/authController';
 import { authenticateToken } from '../utils/authUtils';
 
 const express = require('express');
@@ -72,6 +72,6 @@ userAuthRouter.post('/login', login);
 
 // userAuthRouter.post('/verify-email-otp', verifyOtp);
 
-// userAuthRouter.post('/generate-refresh-token', getRefreshToken);
+userAuthRouter.post('/generate-refresh-token', getRefreshToken);
 
 export { userAuthRouter };
