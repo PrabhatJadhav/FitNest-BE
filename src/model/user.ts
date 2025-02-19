@@ -32,10 +32,12 @@ User.init(
     createdAt: {
       type: DataTypes.BIGINT,
       field: 'created_at',
+      allowNull: false,
     },
     updatedAt: {
       type: DataTypes.BIGINT,
       field: 'updated_at',
+      allowNull: false,
     },
   },
   {
