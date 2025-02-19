@@ -5,8 +5,13 @@ import {
   authorizeUser,
   createNewUser,
   generateTokenWithRefreshToken,
+  sendOtpToUser,
 } from '../utils/authUtils';
-import { GENERAL_ERROR, REFRESH_TOKEN_MISSING } from '../constants/messages';
+import {
+  GENERAL_ERROR,
+  REFRESH_TOKEN_MISSING,
+  USER_ID_NOT_FOUND,
+} from '../constants/messages';
 
 const login = async (
   req: Request<{}, {}, AuthRequestBody>,
@@ -57,5 +62,15 @@ const getRefreshToken = async (req: any, res: any, next: any) => {
   }
 };
 
-export { login, getRefreshToken };
+const sendOtp = async (req: any, res: any, next: any) => {
+  const user = req.user;
+
+  if (!user?.id) {
+    return res.status(400).json({ message: USER_ID_NOT_FOUND });
+  }
+
+  sendOtpToUser(req, res, next);
+};
+
+export { login, getRefreshToken, sendOtp };
 // export { customerRegister, customerLogin, verifyOtp, getRefreshToken };
