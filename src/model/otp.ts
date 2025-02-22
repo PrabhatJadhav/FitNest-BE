@@ -18,7 +18,7 @@ Otp.init(
       allowNull: false,
       primaryKey: true,
     },
-    userId: {
+    userid: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -26,7 +26,7 @@ Otp.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    expires_at: {
+    expiresAt: {
       type: DataTypes.BIGINT,
       field: 'expires_at',
       allowNull: false,
@@ -68,7 +68,19 @@ const createUserOtpTable = async () => {
   }
 };
 
-export { Otp, createUserOtpTable };
+const alterUserOtpTable = async () => {
+  try {
+    await sequelize.query(`
+    ALTER TABLE otps ADD COLUMN userId UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE;
+    `);
+
+    console.log('Users Otp table altered');
+  } catch (e) {
+    console.log('Error altering Otp table:', e);
+  }
+};
+
+export { Otp, createUserOtpTable, alterUserOtpTable };
 
 // CREATE TABLE otps (
 //     id SERIAL PRIMARY KEY,

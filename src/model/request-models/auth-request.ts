@@ -1,5 +1,6 @@
 import { Request } from 'express';
-import { JwtTokenPayload } from '../jwtTokenPayload.model';
+// import { JwtTokenPayload } from '../jwtTokenPayload.model';
+import { User } from '../user';
 
 export interface AuthRequestBody {
   email: string;
@@ -8,7 +9,7 @@ export interface AuthRequestBody {
 }
 
 export interface AuthenticatedRequest extends Request {
-  user?: JwtTokenPayload;
+  user?: User;
   headers: {
     authorization?: string;
   };

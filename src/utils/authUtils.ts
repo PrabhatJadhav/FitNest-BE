@@ -29,6 +29,8 @@ import {
   USER_ID_NOT_FOUND,
 } from '../constants/messages';
 import { Otp } from '../model/otp';
+import { authenticator } from 'otplib';
+import nodemailer from 'nodemailer';
 
 const generateToken = (tokenPayload: JwtTokenPayload): string | null => {
   if (
@@ -151,7 +153,7 @@ const createNewUser = async (email: string, password: string) => {
   return null;
 };
 
-async function authorizeUser(
+async function userLogin(
   req: Request<{}, {}, AuthRequestBody>,
   res: Response,
   user: User,
@@ -183,17 +185,17 @@ async function authorizeUser(
 
     return res.status(500).json({ message: GENERAL_ERROR });
   } catch (e) {
-    console.log('error in authorizeUser', e);
+    console.log('error in userLogin', e);
     return res.status(500).json({ message: GENERAL_ERROR });
   }
 }
 
 // Middleware to verify JWT token
-const authenticateToken = (
+const authenticateToken = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction,
-): Response | void => {
+): Promise<Response | void> => {
   try {
     // const token:string = req.headers.Authorization;
     const token = req.headers.authorization?.split(' ')[1];
@@ -218,7 +220,9 @@ const authenticateToken = (
           });
         }
 
-        req.user = decoded;
+        const user = await User.findOne({ where: { id: decoded.id } });
+
+        req.user = user ?? undefined;
         next();
       } catch (error) {
         return res.status(500).json({
@@ -230,7 +234,7 @@ const authenticateToken = (
       return res.status(500).json({ message: GENERAL_ERROR });
     }
   } catch (e) {
-    console.log('error in authorizeUser', e);
+    console.log('error in userLogin', e);
     return res.status(500).json({ message: GENERAL_ERROR });
   }
 };
@@ -265,41 +269,105 @@ const sendOtpToUser = async (
   res: Response,
   next: NextFunction,
 ) => {
-  // const user = req.user;
-  // if (user?.id) {
-  //   try {
-  //     if (
-  //       process.env.TWILIO_ACCOUNT_SID &&
-  //       process.env.TWILIO_AUTH_TOKEN &&
-  //       process.env.TWILIO_SERVICE_SID
-  //     ) {
-  //       let otpSendResult = await twilioClient(
-  //         process.env.TWILIO_ACCOUNT_SID,
-  //         process.env.TWILIO_AUTH_TOKEN,
-  //       )
-  //         .verify.v2.services(process.env.TWILIO_SERVICE_SID)
-  //         .verifications.create({ to: '+917506514656', channel: 'sms' });
-  //       console.log('otpSendResult', otpSendResult);
-  //       if (otpSendResult) {
-  //         return res.status(200).json({ message: OTP_SENDING_SUCCESSFULLY });
-  //       } else {
-  //         return res.status(500).json({ message: OTP_SENDING_ERROR });
-  //       }
-  //     } else {
-  //       return res.status(500).json({ message: OTP_SENDING_ERROR });
-  //     }
-  //   } catch (e) {
-  //     console.log('e', e);
-  //     return res.status(500).json({ message: OTP_SENDING_ERROR });
-  //   }
-  // }
-  // return res
-  //   .status(500)
-  //   .json({ message: GENERAL_ERROR, devMessage: USER_ID_MISSING });
+  const user = req.user;
+
+  if (user?.id) {
+    try {
+      const otp = await createOtp(user?.id);
+
+      if (
+        process.env.EMAIL_SENDER_ACCOUNT &&
+        process.env.EMAIL_SENDER_ACCOUNT_PASSWORD &&
+        otp
+      ) {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false, // Use `true` for port 465, `false` for all other ports
+          auth: {
+            user: process.env.EMAIL_SENDER_ACCOUNT,
+            pass: process.env.EMAIL_SENDER_ACCOUNT_PASSWORD,
+          },
+        });
+
+        const otpSendResult = await transporter.sendMail({
+          from: {
+            name: 'Prabhat Test Mails',
+            address: process.env.EMAIL_SENDER_ACCOUNT,
+          }, // sender address
+          to: user?.email ?? '', // list of receivers
+          subject: 'Your OTP Code',
+          text: `Your OTP code is ${otp}`,
+        });
+
+        if (otpSendResult) {
+          return res.status(200).json({ message: OTP_SENDING_SUCCESSFULLY });
+        } else {
+          return res.status(500).json({ message: OTP_SENDING_ERROR });
+        }
+      } else {
+        return res.status(500).json({ message: OTP_SENDING_ERROR });
+      }
+    } catch (e) {
+      console.log('e', e);
+      return res.status(500).json({ message: OTP_SENDING_ERROR });
+    }
+  }
+  return res
+    .status(500)
+    .json({ message: GENERAL_ERROR, devMessage: USER_ID_MISSING });
 };
 
+const createOtp = async (userId: string): Promise<string | null> => {
+  try {
+    if (process.env.OTP_EXPIRY) {
+      const otp = authenticator.generate(authenticator?.generateSecret());
+
+      // const newUser = await User.create({ email, password: hashedPassword });
+      let otpRecord;
+
+      try {
+        otpRecord = await Otp.create({
+          userid: userId,
+          otp,
+          expiresAt: Date.now() + Number(process.env.OTP_EXPIRY),
+          createdAt: Date.now(),
+          verified: false,
+        });
+      } catch (e) {
+        console.log('otp enter error', e);
+      }
+
+      if (otpRecord) {
+        return otp;
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
+  } catch (e) {
+    return null;
+  }
+};
+
+// export const verifyEmailOtp = async (userId: string, otp: string) => {
+//   try {
+//     const otpRecord = await OtpSchema.findOne({ userId, otp });
+//     if (!otpRecord || otpRecord.expiresAt < new Date()) {
+//       return false;
+//     }
+//     await OtpSchema.deleteOne({ _id: otpRecord._id });
+//     return true;
+//   } catch (err) {
+//     console.log('err with verify otp', err);
+//     return false;
+//   }
+// };
+
 export {
-  authorizeUser,
+  userLogin,
   createNewUser,
   authenticateToken,
   generateTokenWithRefreshToken,
