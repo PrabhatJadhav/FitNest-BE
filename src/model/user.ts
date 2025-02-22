@@ -67,4 +67,44 @@ const createUserTable = async () => {
   }
 };
 
-export { User, createUserTable };
+const alterUserTable = async () => {
+  try {
+    await sequelize.query(`
+  DO $$ 
+  BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumtypid = 'lifestyle_enum'::regtype AND enumlabel = 'Moderate') THEN
+      ALTER TYPE lifestyle_enum ADD VALUE 'Moderate';
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM pg_enum WHERE enumtypid = 'lifestyle_enum'::regtype AND enumlabel = 'Light') THEN
+      ALTER TYPE lifestyle_enum ADD VALUE 'Light';
+    END IF;
+  END $$;
+`);
+
+    // // Step 1: Create ENUM type if not exists
+    // await sequelize.query(`
+    //   DO $$
+    //   BEGIN
+    //     IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'lifestyle_enum') THEN
+    //       EXECUTE 'CREATE TYPE lifestyle_enum AS ENUM (''Sedentary'', ''Active'', ''Very Active'')';
+    //     END IF;
+    //   END $$;
+    // `);
+
+    // // Step 2: Alter table and add columns
+    // await sequelize.query(`
+    //   ALTER TABLE users
+    //   ADD COLUMN IF NOT EXISTS lifestyle_type lifestyle_enum,
+    //   ADD COLUMN IF NOT EXISTS diet_type VARCHAR(255),
+    //   ADD COLUMN IF NOT EXISTS total_sleep INTEGER,
+    //   ADD COLUMN IF NOT EXISTS eat_out INTEGER;
+    // `);
+
+    console.log('✅ Users table altered successfully');
+  } catch (error) {
+    console.error('❌ Error altering Users table:', error);
+  }
+};
+
+export { User, createUserTable, alterUserTable };

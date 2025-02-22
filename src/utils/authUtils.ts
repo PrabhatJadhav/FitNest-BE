@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import twilioClient from 'twilio';
 import jwt, { SignOptions } from 'jsonwebtoken';
 require('dotenv').config();
 import { User } from '../model/user';
@@ -10,7 +9,7 @@ import {
 } from '../model/request-models/auth-request';
 import { JwtTokenPayload } from '../model/jwtTokenPayload.model';
 import type { StringValue } from 'ms';
-import { UserRoles } from '../enums/roleEnums';
+import { UserRoles } from '../enums/role-enums';
 import {
   DECODING_TOKEN_ERROR,
   GENERAL_ERROR,
@@ -370,20 +369,6 @@ const createOtp = async (userId: string): Promise<string | null> => {
   }
 };
 
-// export const verifyEmailOtp = async (userId: string, otp: string) => {
-//   try {
-//     const otpRecord = await OtpSchema.findOne({ userId, otp });
-//     if (!otpRecord || otpRecord.expiresAt < new Date()) {
-//       return false;
-//     }
-//     await OtpSchema.deleteOne({ _id: otpRecord._id });
-//     return true;
-//   } catch (err) {
-//     console.log('err with verify otp', err);
-//     return false;
-//   }
-// };
-
 export {
   userLogin,
   createNewUser,
@@ -392,35 +377,3 @@ export {
   verifyOtp,
   sendOtpToUser,
 };
-
-// .then(async (verification) => {
-//             console.log('otp send ==>', verification);
-
-//             // const newOtp = await Otp.create({
-//             //   userId: user.id,
-//             //   otp: otp,
-//             // });
-
-//             // console.log('newOtp', newOtp);
-//             res.status(200).json({ message: OTP_SENDING_SUCCESSFULLY });
-//           })
-
-// if (process.env.ACCESS_TOKEN_SECRET) {
-//   try {
-//     let decodedResult: JwtTokenPayload = jwt.verify(
-//       token,
-//       process.env.ACCESS_TOKEN_SECRET,
-//     ) as JwtTokenPayload;
-
-//     if (decodedResult?.userId) {
-//       return decodedResult;
-//     } else {
-//       return null;
-//     }
-//   } catch (err) {
-//     console.log('verifyToken catch', err);
-//     return null;
-//   }
-// } else {
-//   return null;
-// }
