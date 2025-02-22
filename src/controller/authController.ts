@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { AuthRequestBody } from '../model/request-models/auth-request';
 import { User } from '../model/user';
 import {
-  authorizeUser,
+  userLogin,
   createNewUser,
   generateTokenWithRefreshToken,
   sendOtpToUser,
@@ -31,11 +31,11 @@ const login = async (
     console.log('user', user?.get('id'));
 
     if (user?.get('id')) {
-      return authorizeUser(req, res, user, true);
+      return userLogin(req, res, user, true);
     } else {
       user = await createNewUser(email, password);
 
-      if (user) return authorizeUser(req, res, user, false);
+      if (user) return userLogin(req, res, user, false);
 
       return res.status(500).json({ message: GENERAL_ERROR });
     }
