@@ -74,10 +74,6 @@ userAuthRouter.post('/send-otp', authenticateToken, sendOtp);
 
 userAuthRouter.post('/verify-email-otp', authenticateToken, verifyOtp);
 
-userAuthRouter.post(
-  '/generate-refresh-token',
-  authenticateToken,
-  getRefreshToken,
-);
+userAuthRouter.post('/generate-refresh-token', getRefreshToken);
 
 export { userAuthRouter };

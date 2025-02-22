@@ -10,6 +10,7 @@ export const OTP_SENDING_ERROR = "Couldn't send OTP";
 export const OTP_SENDING_SUCCESSFULLY = 'OTP send successfully';
 export const OTP_VERIFIED_SUCCESSFULLY = 'OTP verified!';
 export const TOKEN_EXPIRED_ERROR = 'Token expired';
+export const REFRESH_TOKEN_EXPIRED_ERROR = 'Refresh Token expired';
 export const NEW_TOKEN_GENERATION_SUCCESS = 'New token generated successfully';
 export const DECODING_TOKEN_ERROR = 'Error decoding token';
 export const NO_TOKEN_ERROR = 'Token is required to access this resource!';

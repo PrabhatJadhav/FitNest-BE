@@ -22,6 +22,7 @@ import {
   OTP_SENDING_ERROR,
   OTP_SENDING_SUCCESSFULLY,
   OTP_VERIFIED_SUCCESSFULLY,
+  REFRESH_TOKEN_EXPIRED_ERROR,
   REFRESH_TOKEN_MISSING,
   SESSION_EXPIRED,
   TOKEN_EXPIRED_ERROR,
@@ -56,14 +57,14 @@ const generateToken = (tokenPayload: JwtTokenPayload): string | null => {
 };
 
 const generateRefreshToken = (tokenPayload: JwtTokenPayload): string | null => {
-  if (process.env.REFRESH_TOKEN_SECRET && process.env.TOKEN_EXPIRY) {
-    const TOKEN_EXPIRY: StringValue = process.env.TOKEN_EXPIRY
-      ? isNaN(Number(process.env.TOKEN_EXPIRY))
-        ? (process.env.TOKEN_EXPIRY as StringValue)
-        : '20m'
-      : '20m';
+  if (process.env.REFRESH_TOKEN_SECRET && process.env.REFRESH_TOKEN_EXPIRY) {
+    const REFRESH_TOKEN_EXPIRY: StringValue = process.env.REFRESH_TOKEN_EXPIRY
+      ? isNaN(Number(process.env.REFRESH_TOKEN_EXPIRY))
+        ? (process.env.REFRESH_TOKEN_EXPIRY as StringValue)
+        : '90d'
+      : '90d';
 
-    const options: SignOptions = { expiresIn: TOKEN_EXPIRY };
+    const options: SignOptions = { expiresIn: REFRESH_TOKEN_EXPIRY };
     try {
       return jwt.sign(tokenPayload, process.env.REFRESH_TOKEN_SECRET, options);
     } catch (e) {
@@ -118,9 +119,10 @@ const generateTokenWithRefreshToken = async (req: any, res: any, next: any) => {
         }
       } catch (err) {
         console.log('err with token', err);
-        return res
-          .status(401)
-          .json({ message: SESSION_EXPIRED, devMessage: TOKEN_EXPIRED_ERROR });
+        return res.status(401).json({
+          message: SESSION_EXPIRED,
+          devMessage: REFRESH_TOKEN_EXPIRED_ERROR,
+        });
       }
     } else if (!refreshToken) {
       return res
