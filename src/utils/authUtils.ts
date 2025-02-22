@@ -143,7 +143,12 @@ const createNewUser = async (email: string, password: string) => {
         parseInt(process.env.BCRYPT_SALT, 10),
       );
 
-      const newUser = await User.create({ email, password: hashedPassword });
+      const newUser = await User.create({
+        email,
+        password: hashedPassword,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
 
       return newUser;
     } catch (e) {
@@ -247,21 +252,32 @@ const verifyOtp = async (
   next: NextFunction,
 ) => {
   let { otp } = req.body;
+  const user = req.user;
 
   if (!otp) {
     return res.status(500).json({ message: NO_OTP_ERROR });
   }
 
   try {
-    // const isValidOtp = await verifyEmailOtp(userId, otp);
+    const otpObject = await Otp.findOne({
+      where: { userid: user?.id, otp: otp },
+    });
 
-    if (true) {
-      return res.status(200).json({ message: OTP_VERIFIED_SUCCESSFULLY });
+    if (otpObject && Number(otpObject?.dataValues?.expiresAt) >= Date.now()) {
+      const deletionResult = await Otp.destroy({
+        where: { id: otpObject?.dataValues?.id },
+      });
+
+      if (deletionResult == 1) {
+        return res.status(200).json({ message: OTP_VERIFIED_SUCCESSFULLY });
+      } else {
+        return res.status(500).json({ message: GENERAL_ERROR });
+      }
     } else {
       return res.status(500).json({ message: INVALID_OTP_ERROR });
     }
   } catch (e) {
-    console.log('e', e);
+    console.log('e in verifyOtp', e);
     return res.status(500).json({ message: GENERAL_ERROR });
   }
 };
@@ -333,7 +349,7 @@ const createOtp = async (userId: string): Promise<string | null> => {
         otpRecord = await Otp.create({
           userid: userId,
           otp,
-          expiresAt: Date.now() + Number(process.env.OTP_EXPIRY),
+          expiresAt: Date.now() + Number(process.env.OTP_EXPIRY) * 60 * 1000,
           createdAt: Date.now(),
           verified: false,
         });
