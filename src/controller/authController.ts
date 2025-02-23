@@ -28,7 +28,7 @@ const login = async (
 
     let user = await User.findOne({ where: { email } });
 
-    console.log('user', user?.get('id'));
+    // console.log('user', user?.get('id'));
 
     if (user?.get('id')) {
       return userLogin(req, res, user, true);
@@ -73,4 +73,3 @@ const sendOtp = async (req: any, res: any, next: any) => {
 };
 
 export { login, getRefreshToken, sendOtp };
-// export { customerRegister, customerLogin, verifyOtp, getRefreshToken };
