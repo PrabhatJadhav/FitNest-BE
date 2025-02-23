@@ -8,9 +8,10 @@ export interface AuthRequestBody {
   userId: string;
 }
 
-export interface AuthenticatedRequest extends Request {
+export interface AuthenticatedRequest<T = any> extends Request {
   user?: User;
   headers: {
     authorization?: string;
   };
+  body: T;
 }

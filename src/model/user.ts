@@ -1,10 +1,15 @@
 import { Model, DataTypes } from 'sequelize';
 import sequelize from '../config/database';
+import { LifestyleType } from '../enums/lifestyle-enums';
 
 class User extends Model {
   public id!: string;
   public email!: string;
   public password!: string;
+  public lifestyle_type!: LifestyleType;
+  public diet_type!: string;
+  public total_sleep!: number;
+  public eat_out!: number;
   public created_at!: number;
   public updated_at!: number;
 }
@@ -26,6 +31,22 @@ User.init(
       },
     },
     password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    lifestyle_type: {
+      type: DataTypes.ENUM(...Object.values(LifestyleType)),
+      allowNull: false,
+    },
+    diet_type: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    total_sleep: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    eat_out: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -101,9 +122,9 @@ const alterUserTable = async () => {
     //   ADD COLUMN IF NOT EXISTS eat_out INTEGER;
     // `);
 
-    console.log('✅ Users table altered successfully');
+    console.log('Users table altered successfully');
   } catch (error) {
-    console.error('❌ Error altering Users table:', error);
+    console.error('Error altering Users table:', error);
   }
 };
 
