@@ -36,19 +36,19 @@ User.init(
     },
     lifestyle_type: {
       type: DataTypes.ENUM(...Object.values(LifestyleType)),
-      allowNull: false,
+      allowNull: true,
     },
     diet_type: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     total_sleep: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     eat_out: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     createdAt: {
       type: DataTypes.BIGINT,
