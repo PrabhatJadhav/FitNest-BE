@@ -13,14 +13,24 @@ const PORT = process.env.PORT || 8080;
 // Execute database connection
 dbConnect();
 
+app.use(
+  cors({
+    origin: 'http://localhost:4200', // Allow frontend origin
+    credentials: true, // Allow cookies and auth headers
+    methods: 'GET,POST,PUT,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type,Authorization',
+  }),
+);
+// app.use(cors()); // Allows all origins
+
+// app.use(express.json());
+
 app.use(bodyParser.json());
 app.use(
   bodyParser.urlencoded({
     extended: true,
   }),
 );
-app.use(cors());
-app.use(express.json());
 
 /************** Swagger Doc Routes **************/
 
