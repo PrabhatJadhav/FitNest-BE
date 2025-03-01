@@ -48,7 +48,7 @@ app.use('/api/v1/docs', swaggerUi?.serve, swaggerUi?.setup(swaggerDocs));
 //     .send({ data: "Hello, this is test api welcome to port 8080" });
 // });
 
-app.use('/api/v1', v1Router);
+app.use('/v1', v1Router);
 
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
