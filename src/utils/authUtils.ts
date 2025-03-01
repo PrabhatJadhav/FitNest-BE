@@ -169,7 +169,10 @@ async function userLogin(
     const { email, password } = req.body;
 
     if (existingUser) {
-      const isPasswordValid = await bcrypt.compare(password, user.password);
+      const isPasswordValid = await bcrypt.compare(
+        password,
+        user.dataValues.password,
+      );
       if (!isPasswordValid) {
         return res.status(401).json({ message: 'Invalid email or password' });
       }
