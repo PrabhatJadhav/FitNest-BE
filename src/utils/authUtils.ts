@@ -187,9 +187,15 @@ async function userLogin(
     const refreshToken = generateRefreshToken(userPayload);
 
     if (token && refreshToken) {
-      return res
-        .status(200)
-        .json({ message: 'Login successful', token, refreshToken });
+      const userObject = user?.dataValues;
+      delete userObject.password;
+
+      return res.status(200).json({
+        message: 'Login successful',
+        token,
+        refreshToken,
+        user: userObject,
+      });
     }
 
     return res.status(500).json({ message: GENERAL_ERROR });
