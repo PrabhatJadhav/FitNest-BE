@@ -195,6 +195,7 @@ async function userLogin(
         token,
         refreshToken,
         user: userObject,
+        newUser: existingUser,
       });
     }
 
